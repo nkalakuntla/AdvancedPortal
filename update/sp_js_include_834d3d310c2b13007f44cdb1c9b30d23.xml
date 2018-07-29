@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<record_update table="sp_js_include">
+    <sp_js_include action="INSERT_OR_UPDATE">
+        <display_name>ngTagsInput.js</display_name>
+        <source>local</source>
+        <sys_class_name>sp_js_include</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2018-07-27 17:42:07</sys_created_on>
+        <sys_id>834d3d310c2b13007f44cdb1c9b30d23</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>ngTagsInput.js</sys_name>
+        <sys_package display_value="Cloud Dimensions Events" source="x_snc_cloudevents">77108b70610813007f44e59882b97a67</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="Cloud Dimensions Events">77108b70610813007f44e59882b97a67</sys_scope>
+        <sys_ui_script display_value="ng-tags-input.js">27db31bd0ce713007f44cdb1c9b30d6e</sys_ui_script>
+        <sys_update_name>sp_js_include_834d3d310c2b13007f44cdb1c9b30d23</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2018-07-27 17:42:07</sys_updated_on>
+        <url/>
+    </sp_js_include>
+</record_update>

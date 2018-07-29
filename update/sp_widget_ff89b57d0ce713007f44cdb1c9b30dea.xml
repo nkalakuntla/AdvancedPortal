@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<record_update table="sp_widget">
+    <sp_widget action="INSERT_OR_UPDATE">
+        <category>custom</category>
+        <client_script><![CDATA[function(spUserAvatar) {
+   /* widget controller */
+   var c = this;
+
+   /* Step 3. Accept user input */
+	c.saveTags=function(event){
+			c.server.get({
+				tags:event.tags,
+				sys_id:event.sys_id.value
+			})
+				.then(function(rsp){
+				c.data.msg = rsp.data.msg;
+				c.data.state = rsp.data.state;
+			})
+	}
+	
+	_.each(c.data.events, function(ev){
+		
+		var avatar = spUserAvatar.getAvatar(ev.presenter.value).then(function(rsp){
+			ev.avatar = rsp;
+		});
+	});
+	
+	
+}	]]></client_script>
+        <controller_as>c</controller_as>
+        <css/>
+        <data_table>sp_instance</data_table>
+        <demo_data/>
+        <description/>
+        <docs/>
+        <field_list/>
+        <has_preview>true</has_preview>
+        <id>event-information</id>
+        <internal>false</internal>
+        <link/>
+        <name>Event Information</name>
+        <option_schema/>
+        <public>false</public>
+        <roles/>
+        <script><![CDATA[(function() {
+
+	/* Step 1. Load initial data from the server */
+			/* populate the 'data' object */
+			/* e.g., data.table = $sp.getValue('table'); */
+
+	if(!input) {
+		var fields = 'sys_id,name,description,start_date,end_date,certification,certification_name,location,presenter';
+		
+		data.events = [];
+		
+		var gr = new GlideRecord('x_snc_cloudevents_events');
+		gr.addActiveQuery();
+		gr.query();
+		
+		while (gr.next()){
+			var o = $sp.getFieldsObject(gr,fields);
+			o.tags = gr.tags.toString().split(',');
+			data.events.push(o);
+		}
+	}
+
+
+
+
+	/* Step 4. Process user input */
+	
+	if(input) {
+		var updateTags = new GlideRecord('x_snc_cloudevents_events');
+		updateTags.get(input.sys_id);
+		updateTags.tags=input.tags.join(',');
+		
+		var result = updateTags.update();
+		
+		if(result){
+			data.msg="Tags Saved";
+			data.state = "success";
+			
+		}
+	}
+
+})();	]]></script>
+        <servicenow>false</servicenow>
+        <sys_class_name>sp_widget</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2018-07-27 17:25:41</sys_created_on>
+        <sys_id>ff89b57d0ce713007f44cdb1c9b30dea</sys_id>
+        <sys_mod_count>12</sys_mod_count>
+        <sys_name>Event Information</sys_name>
+        <sys_package display_value="Cloud Dimensions Events" source="x_snc_cloudevents">77108b70610813007f44e59882b97a67</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="Cloud Dimensions Events">77108b70610813007f44e59882b97a67</sys_scope>
+        <sys_update_name>sp_widget_ff89b57d0ce713007f44cdb1c9b30dea</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2018-07-27 19:09:30</sys_updated_on>
+        <template><![CDATA[<form>
+  
+  <!-- Step 2. Display initial data from the server -->
+<uib-tabset class="cloud-widgets">
+  	<legend>Event Details</legend>
+    
+    <!-- Display each Event on a separate tab -->
+    <uib-tab heading="{{event.name.display_value}}"
+             ng-repeat="event in c.data.events">
+      <div class="margin-bottom-10"></div>
+      
+      <!-- Bootstrap's Description List displays record deatils on the tab -->
+      <dl ng-repeat="(key,val) in event"
+          ng-if="key != 'sys_id' && val.label.length && val.display_value.length">
+        <dt>{{val.label}}</dt>
+        <dd>{{val.display_value}}</dd>
+      </dl>
+    <!-- Presenter's Avatar -->
+<div class="avatar-extra-large avatar-container margin-bottom-10"
+     style="cursor:default;"
+     uib-tooltip="{{event.presenter.display_value}}">
+	<div class="avatar soloAvatar bottom">
+		<div class="sub-avatar mia" ng-style="event.avatar">
+			<i class="fa fa-user"></i>
+		</div>
+	</div>
+</div>
+    
+    <tags-input class="margin-bottom-10"
+                placeholder="{{c.placeholderText}}"
+								use-strings="true"
+                ng-model="event.tags"
+                ng-disabled="c.data.isReadOnly">
+    </tags-input>
+                                                                          
+    <input type="button" value="Save" class="btn btn-primary"
+           ng-if="!c.data.isReadOnly"
+           ng-click="c.saveTags(event)">
+      
+ <!--   <tags-input class="margin-bottom-10" 
+                  placeholder="{{c.placeholderText}}"
+                  use-strings="true"
+                  ng-model="event.tags"
+                  ng-disabled="c.data.isReadOnly">
+      </tags-input>
+      <input type="button" value="Save" class="btn btn-primary" ng-if="!c.data.isReadOnly"> -->
+    </uib-tab>
+  </uib-tabset>
+
+  
+  <!-- Step 5. Display customized content based on user input -->
+  <div class="alert alert-{{::c.data.state}}" ng-if="c.data.msg">
+    {{::c.data.msg}}
+  </div>
+  
+  
+</form>
+	]]></template>
+    </sp_widget>
+</record_update>

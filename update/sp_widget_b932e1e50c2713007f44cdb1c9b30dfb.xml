@@ -1,0 +1,212 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<record_update table="sp_widget">
+    <sp_widget action="INSERT_OR_UPDATE">
+        <category>custom</category>
+        <client_script><![CDATA[function(spUtil, $scope,$timeout, $uibModal) {
+   /* widget controller */
+   var c = this;
+
+   /* Step 3. Accept user input */
+	
+	c.selectAg = function(record){
+		c.data.selectedAg = record.agValue;
+		c.server.update();
+	}
+	
+	c.sortOder = false;
+	c.changeSortCol = function(key){
+		if(key == c.orderCol){
+			c.sortOrder = !c.sortOrder;
+		}
+		else{
+			c.sortOrder = false;
+		}
+		
+		c.orderCol = key;
+	}
+	
+	c.updatedFromServer = false;
+	spUtil.recordWatch($scope, c.data.table, '', function(updateObj){
+		spUtil.update($scope);
+		c.updatedFromServer = true;
+		if(!c.updatedRegs){
+			c.updatedRegs = {};
+		}
+		c.updatedRegs[changeObj.data.sys_id] = true;
+		$timeout(function(){
+			c.updatedRegs[changeObj.data.sys_id] = false;
+		}, 6000)
+	})
+	
+	c.openRecord = function(record){
+		c.modalInstance = $uibModal.open({			
+			templateUrl:'table-summary-overlay.html',
+			controllerAs:'modalC',
+			controller:function(){
+				var modalC = this;
+				modalC.record=record;
+				modalC.modalInstance = c.modalInstance;
+				spUtil.get('widget-form',{
+					sys_id:modalC.record.sys_id,
+					table:c.data.table
+				}).then(function(response){
+					modalC.form = response;
+				})
+			}
+		})
+	}
+}	]]></client_script>
+        <controller_as>c</controller_as>
+        <css>.badge{background:red;}
+.highlight{
+  background-color:gray;
+  color:white;
+}
+.customClass .tooltip-inner{
+	color:white;
+  background-color:red;
+}</css>
+        <data_table>sp_instance_table</data_table>
+        <demo_data/>
+        <description/>
+        <docs/>
+        <field_list>table</field_list>
+        <has_preview>true</has_preview>
+        <id>table-summary</id>
+        <internal>false</internal>
+        <link><![CDATA[function(){
+	$('.list-group').on('click','.list-group-item', function(){
+		$('.list-group').find('li.highight').removeClass('highlight');
+		$(this).addClass('highlight')
+	})
+}]]></link>
+        <name>Table Summary</name>
+        <option_schema>[{"name":"aggregate_field","section":"Data","label":"Aggregate field","type":"field_name"},{"name":"title","section":"Presentation","label":"Title","type":"string"},{"name":"display_fields","section":"Presentation","label":"Display fields","type":"field_list"}]</option_schema>
+        <public>false</public>
+        <roles/>
+        <script><![CDATA[(function() {
+
+	/* Step 1. Load initial data from the server */
+			/* populate the 'data' object */
+			/* e.g., data.table = $sp.getValue('table'); */
+
+	if(!input) {
+		data.summary = [];
+		//data.table = 'x_snc_cloudevents_registrations';
+		//data.groupBy = 'event';
+		//data.fields = 'first_name,last_name,company,email,event,start_date,state';
+		
+		data.table = input && input.table || $sp.getParameter('table') || options.table || 'incident';
+		data.groupBy = input && input.groupBy || $sp.getParameter('groupBy') || options.aggregate_field || 'category';
+		data.fields = input && input.fields || $sp.getParameter('fields') || options.display_fields || 'number,short_description,sys_updated_on';
+		
+		var ga = new GlideAggregate(data.table);
+		ga.setGroup(true);
+		ga.groupBy(data.groupBy);
+		ga.addAggregate('COUNT');
+		ga.query();
+		
+		while(ga.next()){
+			data.summary.push({
+				agName:ga[data.groupBy].getDisplayValue() || 'none',
+				agValue: ga[data.groupBy].toString(),
+				agCount:ga.getAggregate('COUNT')
+			});
+		}
+	
+		
+	}
+
+
+
+	/* Step 4. Process user input */
+	
+	if(input) {
+		//console.log("selected ag from server" + input.selectedAg);
+		data.records = [];
+		var gr = new GlideRecord(input.table);
+		gr.addQuery(input.groupBy,input.selectedAg);
+		gr.query();
+		
+		data.labels = $sp.getFieldsObject(gr, input.fields);
+		
+		while(gr.next()){
+			var o = {};
+			$sp.getRecordDisplayValues(o, gr, input.fields);
+			$sp.getRecordValues(o, gr, 'sys_id');
+			data.records.push(o);
+		}
+	}
+
+})();	]]></script>
+        <servicenow>false</servicenow>
+        <sys_class_name>sp_widget</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2018-07-26 21:05:41</sys_created_on>
+        <sys_id>b932e1e50c2713007f44cdb1c9b30dfb</sys_id>
+        <sys_mod_count>40</sys_mod_count>
+        <sys_name>Table Summary</sys_name>
+        <sys_package display_value="Cloud Dimensions Events" source="x_snc_cloudevents">77108b70610813007f44e59882b97a67</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="Cloud Dimensions Events">77108b70610813007f44e59882b97a67</sys_scope>
+        <sys_update_name>sp_widget_b932e1e50c2713007f44cdb1c9b30dfb</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2018-07-27 20:18:18</sys_updated_on>
+        <template><![CDATA[<form>
+  
+  <!-- Step 2. Display initial data from the server -->
+  <div class="panel panel-default">
+  <!-- Default panel contents -->
+  <div class="panel-heading">
+    <span class = "fa fa-bolt" ng-show="c.updatedFromServer"  uib-tooltip="updated from server" tooltip-class="customClass"></span>
+    {{::options.title}}</div>
+ 
+  <!-- List group -->
+  <ul class="list-group">
+    <li class="list-group-item"
+               ng-repeat="s in c.data.summary"
+        			ng-click="c.selectAg(s)" >
+      {{s.agName}} <span class="badge">{{s.agCount}}</span>
+    </li>
+  </ul>
+</div>
+  
+  
+  <!-- Step 5. Display customized content based on user input -->
+ <table class="table cloud-widgets"
+        ng-if="c.data.records">
+	<thead>
+		<tr>
+			<th
+          ng-repeat="(key,val) in c.data.labels"
+          ng-click="c.changeSortCol(key)">{{val.label}}
+          <span ng-show="c.orderCol==key">
+      		<span class="fa fa-sort-asc"
+      					ng-show="!c.sortOrder"></span>
+      		<span class="fa fa-sort-desc"
+      					ng-show="c.sortOrder"></span>
+    			</span>
+      </th>
+      <th></th>
+		</tr>
+	</thead>
+
+	<tbody>
+      		<tr ng-repeat = "record in c.data.records | orderBy:c.orderCol : c.sortOrder">
+        <!--		<td ng-repeat="(key,val) in c.data.labels">{{record[key]}}</td> -->
+            <td ng-repeat="(key,val) in c.data.labels">
+             <sp-time-ago date="record[key]" ng-if="val.type == 'glide_date_time'"></sp-time-ago>
+             <span ng-if="val.type != 'glide_date_time'">{{record[key]}}</span>
+            </td>
+            <td>
+              <span class="fa fa-info-circle" ng-click="c.openRecord(record)"></span>
+            </td>
+      		</tr>
+    	</tbody>
+</table>
+  
+  
+</form>
+	]]></template>
+    </sp_widget>
+</record_update>

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<record_update table="m2m_sp_dependency_css_include">
+    <m2m_sp_dependency_css_include action="INSERT_OR_UPDATE">
+        <order>100</order>
+        <sp_css_include display_value="ngTagsInputBootstrap.css">709d7d310c2b13007f44cdb1c9b30d87</sp_css_include>
+        <sp_dependency display_value="ngTagsInput">860db9310c2b13007f44cdb1c9b30df7</sp_dependency>
+        <sys_class_name>m2m_sp_dependency_css_include</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2018-07-27 17:43:17</sys_created_on>
+        <sys_id>50bd3d310c2b13007f44cdb1c9b30dde</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>ngTagsInputBootstrap.css.ngTagsInput</sys_name>
+        <sys_package display_value="Cloud Dimensions Events" source="x_snc_cloudevents">77108b70610813007f44e59882b97a67</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="Cloud Dimensions Events">77108b70610813007f44e59882b97a67</sys_scope>
+        <sys_update_name>m2m_sp_dependency_css_include_50bd3d310c2b13007f44cdb1c9b30dde</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2018-07-27 17:43:17</sys_updated_on>
+    </m2m_sp_dependency_css_include>
+</record_update>
